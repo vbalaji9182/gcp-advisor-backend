@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import os
 from openai import OpenAI
 
-# Load the API key from environment and print debug info
+# Load API key
 api_key = os.getenv("OPENAI_API_KEY")
 print("🔐 Loaded OpenAI Key:", api_key[:5] + "********" if api_key else "❌ Key not found")
 
@@ -12,10 +12,10 @@ client = OpenAI(api_key=api_key)
 
 app = FastAPI()
 
-# Allow requests from frontend
+# CORS setup
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Replace * with your frontend domain in production
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -38,7 +38,6 @@ def ask_question(query: Query):
                 {"role": "user", "content": query.query}
             ]
         )
-        answer = response.choices[0].message.content
-        return {"response": answer}
+        return {"response": response.choices[0].message.content}
     except Exception as e:
         return {"response": f"⚠️ Error: {str(e)}"}
