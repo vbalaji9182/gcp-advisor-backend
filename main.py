@@ -1,28 +1,28 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from pydantic import BaseModel
-import openai
-import os
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
+# Allow requests from any frontend (for now)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Replace * with your frontend domain in production
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 class Query(BaseModel):
-    question: str
+    query: str
+
+@app.get("/")
+def read_root():
+    return {"message": "GCP Advisor Chatbot is running."}
 
 @app.post("/ask")
-async def ask_gcp_advisor(query: Query):
-    try:
-        response = openai.ChatCompletion.create(
-            model="gpt-4",
-            messages=[
-                {"role": "system", "content": "You are a GCP advisor..."},
-                {"role": "user", "content": query.question}
-            ]
-        )
-        return {"response": response.choices[0].message['content']}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+def ask_question(query: Query):
+    return {"response": f"You asked: '{query.query}', here’s a placeholder answer from the bot."}
 
 @app.get("/")
 def read_root():
