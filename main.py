@@ -35,7 +35,7 @@ def extract_reference(query: str) -> str:
     for keyword, ref in GCP_REFERENCES.items():
         if keyword.lower() in query.lower():
             return ref
-    return "ICH E6(R3) – Refer to appropriate section based on context."
+    return "ICH E6(R3)."
 
 # Input and output schemas
 class QueryRequest(BaseModel):
@@ -68,7 +68,7 @@ async def ask_question(data: QueryRequest):
         gpt_reply = completion["choices"][0]["message"]["content"]
         reference = extract_reference(query)
 
-        final_response = f"{gpt_reply}\n\n📘 Reference: {reference}"
+        final_response = f"{gpt_reply}\n\n📘 Further reading: {reference}"
         return {"response": final_response}
 
     except Exception as e:
